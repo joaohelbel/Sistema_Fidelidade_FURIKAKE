@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema de Fidelidade | Furikake</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      padding: 40px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-top: 6px solid #e60000;
+    }
+
+    h2 {
+      color: #0066cc;
+      text-align: center;
+    }
+
+    label {
+      margin-top: 15px;
+      display: block;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      background-color: #0066cc;
+      color: white;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #004c99;
+    }
+
+    .resposta {
+      margin-top: 20px;
+      background-color: #f0f8ff;
+      padding: 15px;
+      border-left: 4px solid #0066cc;
+      white-space: pre-wrap;
+    }
+
+    .links {
+      margin-top: 25px;
+      text-align: center;
+    }
+
+    .links a {
+      color: #e60000;
+      text-decoration: none;
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .logo span {
+      font-size: 28px;
+      color: #e60000;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="logo">
+      <span>🍜</span>
+    </div>
+
+    <h2>Fidelidade Furikake</h2>
+
+    <label>Nome do Cliente:</label>
+    <input type="text" id="nome" placeholder="Ex: João Pedro">
+
+    <label>CPF:</label>
+    <input type="text" id="cpf" placeholder="Somente números">
+
+    <label>Valor da Compra (R$):</label>
+    <input type="number" id="valor" placeholder="Ex: 42.90">
+
+    <button onclick="registrarCompra()">Registrar Compra</button>
+
+    <div id="resposta" class="resposta" style="display:none;"></div>
+
+    <div class="links">
+      <a href="http://localhost:5000/cadeia" target="_blank">Ver Blockchain</a>
+      <a href="#" onclick="verSaldo()">Consultar Saldo por CPF</a>
+    </div>
+  </div>
+
+  <script>
+    function registrarCompra() {
+      const nome = document.getElementById('nome').value;
+      const cpf = document.getElementById('cpf').value;
+      const valor = parseFloat(document.getElementById('valor').value);
+
+      if (!nome || !cpf || isNaN(valor)) {
+        alert("Preencha todos os campos corretamente.");
+        return;
+      }
+
+      fetch('http://localhost:5000/comprar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ nome, cpf, valor })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('resposta').style.display = 'block';
+        document.getElementById('resposta').innerText = JSON.stringify(data, null, 2);
+      })
+      .catch(err => alert("Erro ao conectar ao servidor."));
+    }
+
+    function verSaldo() {
+      const cpf = prompt("Digite o CPF:");
+      if (cpf) {
+        window.open(`http://localhost:5000/saldo/${cpf}`, '_blank');
+      }
+    }
+  </script>
+
+</body>
+</html>

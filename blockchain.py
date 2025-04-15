@@ -26,20 +26,23 @@ class Blockchain:
         return self.chain[-1]
 
     def adicionar_bloco(self, compra):
-        cliente = compra['cliente']
+        nome = compra['nome']
+        cpf = compra['cpf']
         valor = float(compra['valor'])
+        
 
-        carimbos_atuais = self.carimbos_por_cliente.get(cliente, 0)
+        carimbos_atuais = self.carimbos_por_cliente.get(cpf, 0)
         carimbos_ganhos = 1 if valor > 39.9 else 0
         carimbos_totais = carimbos_atuais + carimbos_ganhos
 
         pratos_ganhos = carimbos_totais // 10
         carimbos_restantes = carimbos_totais % 10
 
-        self.carimbos_por_cliente[cliente] = carimbos_restantes
+        self.carimbos_por_cliente[cpf] = carimbos_restantes
 
         dados_bloco = {
-            'cliente': cliente,
+            'nome': nome,
+            'cpf': cpf,
             'valor': valor,
             'carimbo_gerado': bool(carimbos_ganhos),
             'carimbos_atuais': carimbos_restantes,
@@ -66,9 +69,9 @@ class Blockchain:
                 return False
         return True
 
-    def saldo_cliente(self, nome):
+    def saldo_cliente(self, cpf):
         return {
-            'cliente': nome,
-            'carimbos': self.carimbos_por_cliente.get(nome, 0),
-            'pratos': sum(1 for b in self.chain if isinstance(b.dados, dict) and b.dados.get('cliente') == nome and b.dados.get('pratos_ganhos') > 0)
+            'cpf': cpf,
+            'carimbos': self.carimbos_por_cliente.get(cpf, 0),
+            'pratos': sum(1 for b in self.chain if isinstance(b.dados, dict) and b.dados.get('cpf') == cpf and b.dados.get('pratos_ganhos') > 0)
         }
