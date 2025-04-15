@@ -9,19 +9,39 @@ CORS(app)
 blockchain = Blockchain()
 
 
-@app.route('/comprar', methods=['POST'])
-def registrar_compra():
+@app.route('/nota', methods=['POST'])
+def registrar_por_nota():
     dados = request.get_json()
-    if not dados or 'cpf' not in dados or 'valor' not in dados:
+    if not dados or 'cpf' not in dados or 'nome' not in dados or 'chave' not in dados:
         return jsonify({'erro': 'Dados inválidos'}), 400
 
-    bloco = blockchain.adicionar_bloco(dados)
+    chave = dados['chave']
+    
+    # Simulação de "leitura da nota fiscal"
+    valor_simulado = simular_leitura_nota(chave)
+
+    compra = {
+        'nome': dados['nome'],
+        'cpf': dados['cpf'],
+        'valor': valor_simulado
+    }
+
+    bloco = blockchain.adicionar_bloco(compra)
+
     return jsonify({
-        'mensagem': 'Compra registrada!',
+        'mensagem': 'Compra registrada via nota!',
+        'valor_lido': valor_simulado,
         'index': bloco.index,
-        'hash': bloco.hash,
         'dados': bloco.dados
     }), 201
+
+def simular_leitura_nota(chave):
+    # Simulação com base nos últimos dígitos da chave
+    try:
+        digito = int(chave[-1])
+        return 35 + (digito * 2)  # Ex: último dígito 3 → R$41
+    except:
+        return 30.0  # Valor mínimo
 
 @app.route('/cadeia', methods=['GET'])
 def ver_cadeia():
@@ -39,15 +59,11 @@ def validar():
     valido = blockchain.validar()
     return jsonify({'valido': valido}), 200
 
-def saldo_cliente(self, cpf):
-    return {
-        'cpf': cpf,
-        'carimbos': self.carimbos_por_cliente.get(cpf, 0),
-        'pratos': sum(
-            1 for b in self.chain
-            if isinstance(b.dados, dict) and b.dados.get('cpf') == cpf and b.dados.get('pratos_ganhos') > 0
-        )
-    }
+@app.route('/saldo/<cpf>', methods=['GET'])
+def saldo(cpf):
+    resultado = blockchain.saldo_cliente(cpf)
+    return jsonify(resultado), 200
+
 
 
 if __name__ == '__main__':

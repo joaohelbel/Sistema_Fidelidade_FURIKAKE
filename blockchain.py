@@ -73,5 +73,8 @@ class Blockchain:
         return {
             'cpf': cpf,
             'carimbos': self.carimbos_por_cliente.get(cpf, 0),
-            'pratos': sum(1 for b in self.chain if isinstance(b.dados, dict) and b.dados.get('cpf') == cpf and b.dados.get('pratos_ganhos') > 0)
+            'pratos': sum(
+                1 for b in self.chain
+                if isinstance(b.dados, dict) and b.dados.get('cpf') == cpf and b.dados.get('pratos_ganhos') > 0
+            )
         }
